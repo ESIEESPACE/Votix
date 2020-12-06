@@ -16,6 +16,7 @@
 /public/build/fonts/glyphicons-*
 /public/build/images/glyphicons-*
 /.idea
+*.code-workspace
 
 ###> symfony/framework-bundle ###
 .env
@@ -46,3 +47,4 @@
 npm-debug.log
 yarn-error.log
 ###< symfony/webpack-encore-bundle ###
+

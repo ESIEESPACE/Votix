@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  votix:
+    build: .
+    volumes: 
+      - ~/v:/data
+    ports:
+      - 80:80
+    environment:
+      LOCALE: fr
+      VOTIX_SECRET: ThisTokenIsNotSoSecretChangeIt
+      VOTIX_KEY_SECRET: ThisTokenIsNotSoSecretChangeIt
+      # Mot de passe à donner au BDE
+      VOTIX_RESULT_PASSWORD: ThisTokenIsNotSoSecretChangeIt
+      HOSTNAME: localhost
+      VOTIX_START: 000000
+      VOTIX_END: 1607288364
+      VOTIX_SUPPORT: votix-docker@domain.tld
+      APP_SECRET: 67d829bf61dc5f87a73fd814e2c9f629
+

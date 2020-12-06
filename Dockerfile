@@ -11,6 +11,7 @@ RUN apt install -y \
     apache2 \
     gnupg2 \
     git \
+    unzip \
     --no-install-recommends
 
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
@@ -38,38 +39,60 @@ RUN DEBIAN_FRONTEND=noninteractive apt update && apt upgrade -y && apt install -
     php7.4-zip \
     php7.4-xdebug
 
-RUN a2enmod rewrite
+RUN a2enmod rewrite && a2dissite 000-default
 
-STOPSIGNAL WINCH
+ENV APACHE_CONFDIR /etc/apache2
+RUN { \
+        echo '<VirtualHost *:80>'; \
+        echo 'DocumentRoot /Votix/public'; \
+        echo 'DirectoryIndex index.php index.html'; \
+        echo '<Directory /Votix/public>'; \
+	echo '   Require all granted'; \
+        echo '   AllowOverride All'; \
+        echo '</Directory>'; \
+        echo '</VirtualHost>'; \
+    } | tee "$APACHE_CONFDIR/sites-available/votix.conf" \
+    && a2ensite votix
+
+
+RUN ln -sf /proc/$$/fd/1 /var/log/apache2/access.log && ln -sf /proc/$$/fd/2 /var/log/apache2/error.log
+
 WORKDIR /
 
 # Composer install
 RUN php -r "copy('https://getcomposer.org/download/1.10.19/composer.phar', 'composer.phar');" && mv composer.phar /usr/bin/composer && chmod +x /usr/bin/composer
 
-RUN git clone https://github.com/ClubNix/Votix
+# RUN git clone https://github.com/ESIEESPACE/Votix -b docker
+
+COPY . /Votix
 
 WORKDIR /Votix
 
 RUN composer install
 
-#RUN composer recipes:install --force -v
-#RUN composer req orm-pack --unpack
 RUN php bin/console assets:install public --symlink
 
 RUN node --version
 RUN yarn install
 RUN yarn run build
 
-RUN ln -s /Votix/public /var/www && mv /var/www/public /var/www/html
 RUN chmod -R 777 /Votix/var
 
+RUN cp config/services.docker.yaml config/services.yaml
 
-# Be careful
-RUN php ./bin/console doctrine:database:drop --force
-RUN php ./bin/console doctrine:database:create
-RUN php ./bin/console doctrine:schema:update --force
-RUN php ./bin/console doctrine:fixtures:load --no-interaction
+RUN mkdir /db
 
+ENV DATABASE_URL sqlite:///%kernel.project_dir%/var/votix.sqlite
+ENV MAILER_URL null://localhost
+ENV APP_ENV prod
+ENV APP_DEBUG 1
+ENV LOCALE en
+ENV SHELL_VERBOSITY 3
 
+# RUN php ./bin/console doctrine:fixtures:load --no-interaction
+
+COPY docker-startup.sh .
+
+VOLUME [ "/data" ]
 EXPOSE 80
-CMD apachectl -D FOREGROUND
+CMD ./docker-startup.sh

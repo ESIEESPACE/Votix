@@ -12,7 +12,6 @@ use App\Entity\Voter;
 use App\Repository\VoterRepository;
 use App\Service\MailerService;
 use App\Service\StatsService;
-use Aws\Ses\SesClient;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -33,20 +32,20 @@ class MailSendCommand extends Command
 
     private $mailerService;
 
-    private $sesClient;
+    private $mailer;
 
     public function __construct(
         LoggerInterface $logger,
         VoterRepository $voterRepository,
         StatsService $statsService,
         MailerService $mailerService,
-        SesClient $sesClient
+        \Swift_Mailer $mailer
     ) {
         $this->logger = $logger;
         $this->voterRepository = $voterRepository;
         $this->statsService = $statsService;
         $this->mailerService = $mailerService;
-        $this->sesClient = $sesClient;
+        $this->mailer = $mailer;
 
         parent::__construct();
     }
@@ -106,7 +105,8 @@ class MailSendCommand extends Command
             $email = $this->mailerService->getTemplatedEmail($voter, $template);
 
             if ($mustExecute) {
-                $emailSentId = $this->sesClient->sendEmail($email);
+                $emailSentId = $this->mailer->send($email);
+                print_r($email);
                 $message = 'Message envoyé à ' . $email['Destination']['ToAddresses'][0];
                 $this->logger->info($message, ['mail' => $emailSentId->getAll()]);
 
