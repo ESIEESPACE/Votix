@@ -59,27 +59,14 @@ class MailerService
      * @param string $title
      * @param string $html
      *
-     * @return array
+     * @return \Swift_Message
      */
     private function getEmailForVoter(Voter $voter, string $title, string $html): array
     {
-        $to = $voter->getFirstname() . ' ' . $voter->getLastname() . '<' . $voter->getEmail() . '>';
-
-        $email = [
-            'Source' => 'Votix <votix@votix.clubnix.fr>',
-            'Destination' => [
-                'ToAddresses' => [$to]
-            ],
-            'Message' => [
-                'Subject' => ['Data' => $title, 'Charset' => 'UTF-8'],
-                'Body' => [
-                    'Html' => ['Data' => $html, 'Charset' => 'UTF-8'],
-                ],
-            ],
-            'ReplyToAddresses' => ['votix@clubnix.fr'],
-            'ReturnPath'       => 'votix@clubnix.fr'
-        ];
-
-        return $email;
+        return (new \Swift_Message($title))
+            ->setFrom(['votix@clubnix.fr' => 'Votix'])
+            ->setReplyTo(['votix@clubnix.fr' => 'Votix'])
+            ->setTo([$voter->getEmail() => $voter->getFirstname() . ' ' . $voter->getLastname()])
+            ->setBody($html, 'text/html');
     }
 }
