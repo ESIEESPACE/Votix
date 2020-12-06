@@ -106,9 +106,8 @@ class MailSendCommand extends Command
 
             if ($mustExecute) {
                 $emailSentId = $this->mailer->send($email);
-                print_r($email);
-                $message = 'Message envoyé à ' . $email['Destination']['ToAddresses'][0];
-                $this->logger->info($message, ['mail' => $emailSentId->getAll()]);
+                //$message = 'Message envoyé à ' . $email->getTo()[0];
+                //$this->logger->info($message, ['mail' => $emailSentId->getAll()]);
 
                 usleep(200000);
             } else {
