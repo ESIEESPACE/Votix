@@ -50,7 +50,8 @@
     "symfony/debug-pack": "^1.0",
     "symfony/webpack-encore-bundle": "^1.2",
     "symfony/serializer-pack": "^1.0",
-    "doctrine/annotations": "^1.11"
+    "doctrine/annotations": "^1.11",
+    "symfony/swiftmailer-bundle": "^3.2.6"
   },
   "conflict": {
     "symfony/symfony": "*"
