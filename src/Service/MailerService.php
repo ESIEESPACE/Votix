@@ -38,7 +38,7 @@ class MailerService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function getTemplatedEmail(Voter $voter, string $template): array
+    public function getTemplatedEmail(Voter $voter, string $template): \Swift_Message
     {
         $tokenService = $this->tokenService;
 
@@ -61,7 +61,7 @@ class MailerService
      *
      * @return \Swift_Message
      */
-    private function getEmailForVoter(Voter $voter, string $title, string $html): array
+    private function getEmailForVoter(Voter $voter, string $title, string $html): \Swift_Message
     {
         return (new \Swift_Message($title))
             ->setFrom(['votix@clubnix.fr' => 'Votix'])
