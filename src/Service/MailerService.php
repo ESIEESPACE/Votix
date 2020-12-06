@@ -32,7 +32,7 @@ class MailerService
      * @param Voter $voter
      * @param string $template
      *
-     * @return array
+     * @return \Swift_Message
      *
      * @throws \Twig\Error\LoaderError
      * @throws \Twig\Error\RuntimeError
