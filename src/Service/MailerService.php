@@ -38,7 +38,7 @@ class MailerService
      * @throws \Twig\Error\RuntimeError
      * @throws \Twig\Error\SyntaxError
      */
-    public function getTemplatedEmail(Voter $voter, string $template): \Swift_Message
+    public function getTemplatedEmail(Voter $voter, string $template, string $votixSenderMail): \Swift_Message
     {
         $tokenService = $this->tokenService;
 
@@ -51,7 +51,7 @@ class MailerService
         $html  = $this->templateEngine->render('mails/' . $template . '.html.twig',  $vars);
         $title = $this->templateEngine->render('mails/' . $template . '.title.twig', $vars);
 
-        return $this->getEmailForVoter($voter, $title, $html);
+        return $this->getEmailForVoter($voter, $title, $html, $votixSenderMail);
     }
 
     /**
@@ -61,11 +61,11 @@ class MailerService
      *
      * @return \Swift_Message
      */
-    private function getEmailForVoter(Voter $voter, string $title, string $html): \Swift_Message
+    private function getEmailForVoter(Voter $voter, string $title, string $html, string $votixSenderMail): \Swift_Message
     {
         return (new \Swift_Message($title))
-            ->setFrom(['votix@clubnix.fr' => 'Votix'])
-            ->setReplyTo(['votix@clubnix.fr' => 'Votix'])
+            ->setFrom([$votixSenderMail => 'Votix'])
+            ->setReplyTo([$votixSenderMail => 'Votix'])
             ->setTo([$voter->getEmail() => $voter->getFirstname() . ' ' . $voter->getLastname()])
             ->setBody($html, 'text/html');
     }

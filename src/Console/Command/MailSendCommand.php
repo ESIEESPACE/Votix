@@ -34,18 +34,22 @@ class MailSendCommand extends Command
 
     private $mailer;
 
+    private $senderMail;
+
     public function __construct(
         LoggerInterface $logger,
         VoterRepository $voterRepository,
         StatsService $statsService,
         MailerService $mailerService,
-        \Swift_Mailer $mailer
+        \Swift_Mailer $mailer,
+        string $votixSenderMail
     ) {
         $this->logger = $logger;
         $this->voterRepository = $voterRepository;
         $this->statsService = $statsService;
         $this->mailerService = $mailerService;
         $this->mailer = $mailer;
+        $this->votixSenderMail = $votixSenderMail;
 
         parent::__construct();
     }
@@ -102,7 +106,7 @@ class MailSendCommand extends Command
 
             $this->logger->info($info);
 
-            $email = $this->mailerService->getTemplatedEmail($voter, $template);
+            $email = $this->mailerService->getTemplatedEmail($voter, $template, $this->votixSenderMail);
 
             if ($mustExecute) {
                 $emailSentId = $this->mailer->send($email);
